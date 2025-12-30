@@ -4,7 +4,7 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
-import google.generativeai as genai
+import google.genai as genai
 
 # Çevresel değişkenleri yükle (.env)
 load_dotenv()
@@ -12,10 +12,7 @@ load_dotenv()
 def configure_gemini():
     """
     Google Gemini API'sini yapılandırır ve en verimli modeli seçer.
-    
-    Seçilen Model: models/gemini-2.5-flash
-    Neden: Hız (Flash mimarisi) ve performans (v2.5) dengesi en yüksek modeldir.
-    
+    Seçilen Model: gemini-1.5-flash-latest
     Returns:
         genai.GenerativeModel: Yapılandırılmış model nesnesi.
     """
@@ -23,18 +20,15 @@ def configure_gemini():
     if not api_key:
         raise ValueError("Lütfen .env dosyasına 'GOOGLE_API_KEY' ekleyin.")
 
-    genai.configure(api_key=api_key)
-    
-    # Listeden seçilen en performanslı ve hızlı model
-    model_name = "models/gemini-2.5-flash"
-    
+    client = genai.Client(api_key=api_key)
+    model_name = "gemini-1.5-flash-latest"
     try:
-        model = genai.GenerativeModel(model_name)
+        model = client.GenerativeModel(model_name)
         return model
     except Exception as e:
         print(f"Model yüklenirken hata oluştu: {e}")
-        print("Yedek model (gemini-2.0-flash) deneniyor...")
-        return genai.GenerativeModel("models/gemini-2.0-flash")
+        print("Yedek model (gemini-1.0-pro-latest) deneniyor...")
+        return client.GenerativeModel("gemini-1.0-pro-latest")
 
 def load_rag_resources():
     """
@@ -106,7 +100,7 @@ def main():
     
     print("Asistan Hazır. (Çıkış için 'q', 'exit' yazabilirsiniz)")
     print("-" * 50)
-
+    client = configure_gemini()
     while True:
         query = input("Soru: ").strip()
         
@@ -133,7 +127,7 @@ def main():
             )
             
             # Gemini'ye gönder
-            response = llm.generate_content(prompt)
+            response = client.models.generate_content(model="models/gemini-2.5-flash", contents=prompt)
             
             # Cevabı yazdır
             print(f"\nCevap:\n{response.text}")

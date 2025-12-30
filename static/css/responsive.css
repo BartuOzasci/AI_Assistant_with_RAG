@@ -1,0 +1,107 @@
+@media (min-width: 900px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: none;
+  }
+  .chatbot-container {
+    position: relative;
+    top: unset;
+    left: unset;
+    right: unset;
+    bottom: unset;
+    margin: 40px auto;
+    max-width: 700px;
+    min-width: 340px;
+    width: 100%;
+    max-height: 900px;
+    min-height: 520px;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.13);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+@media (min-width: 1600px) {
+  .chatbot-container {
+    max-width: 700px;
+    min-width: 340px;
+    width: 700px;
+    margin: 60px auto;
+    min-height: 600px;
+    max-height: 1000px;
+  }
+}
+}
+@media (min-width: 900px) {
+  .chatbot-container {
+    max-width: 700px;
+  }
+  .chat-window {
+    min-height: 520px;
+    max-height: 800px;
+    font-size: 1.15rem;
+  }
+  .chat-input-area textarea {
+    min-height: 120px;
+    max-height: 320px;
+    font-size: 1.15rem;
+  }
+}
+@media (min-width: 1200px) {
+  .chatbot-container {
+    max-width: 1000px;
+  }
+  .chat-window {
+    min-height: 600px;
+    max-height: 900px;
+    font-size: 1.2rem;
+  }
+  .chat-input-area textarea {
+    min-height: 140px;
+    max-height: 400px;
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 600px) {
+  .chatbot-container {
+    max-width: 100vw;
+    border-radius: 0;
+    margin: 0;
+  }
+  .chat-window {
+    min-height: 320px;
+    max-height: 400px;
+    font-size: 1rem;
+  }
+  .chat-input-area textarea {
+    min-height: 80px;
+    max-height: 180px;
+    font-size: 1rem;
+  }
+  .chatbot-footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    background: #f7faff;
+    margin: 0;
+    padding: 12px 0 8px 0;
+    z-index: 10;
+  }
+  .chat-input-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .send-btn,
+  .pdf-label {
+    width: 100%;
+    min-width: unset;
+    padding: 14px 0;
+    font-size: 1rem;
+  }
+}

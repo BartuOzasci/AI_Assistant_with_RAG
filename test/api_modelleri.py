@@ -1,9 +1,9 @@
-import google.generativeai as genai
+import google.genai as genai
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 print("Erişilebilir Modeller:")
 for m in genai.list_models():

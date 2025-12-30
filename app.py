@@ -5,12 +5,12 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
-import google.generativeai as genai
+import google.genai as genai
 
 # Çevresel değişkenleri yükle (.env)
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Kaynakları başta yükle
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -22,15 +22,10 @@ def configure_gemini():
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("Lütfen .env dosyasına 'GOOGLE_API_KEY' ekleyin.")
-    genai.configure(api_key=api_key)
-    model_name = "models/gemini-2.5-flash"
-    try:
-        model = genai.GenerativeModel(model_name)
-        return model
-    except Exception:
-        return genai.GenerativeModel("models/gemini-2.0-flash")
+    client = genai.Client(api_key=api_key)
+    return client
 
-llm = configure_gemini()
+client = configure_gemini()
 
 # Soruya bağlam bulma fonksiyonu
 
@@ -42,6 +37,7 @@ def get_context(query, embed_model, index, chunks, k=5):
 
 @app.route('/')
 def home():
+    # CSS ve JS dosyaları static/css ve static/js altından otomatik sunulur
     return render_template('index.html')
 
 @app.route('/ask', methods=['POST'])
@@ -72,7 +68,7 @@ def ask():
             f"SORU: {question}\n\n"
             f"CEVAP:"
         )
-        response = llm.generate_content(prompt)
+        response = client.models.generate_content(model="models/gemini-2.5-flash", contents=prompt)
         return jsonify({'answer': response.text})
     except Exception as e:
         return jsonify({'answer': f'Hata: {str(e)}'})
