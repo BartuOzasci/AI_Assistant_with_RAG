@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG Avukat Soru Sor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 500px;
+        margin: 60px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background: #0078d7;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #005fa3;
+      }
+      .response {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e9f5e9;
+        border-radius: 4px;
+        color: #222;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>RAG Avukat - Soru Sor</h2>
+      <form id="questionForm">
+        <label for="question">Sorunuz:</label>
+        <textarea id="question" name="question" rows="4" required></textarea>
+        <button type="submit">Gönder</button>
+      </form>
+      <div id="response" class="response" style="display: none"></div>
+    </div>
+    <script>
+      document
+        .getElementById("questionForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const question = document.getElementById("question").value;
+          const responseDiv = document.getElementById("response");
+          responseDiv.style.display = "none";
+          responseDiv.textContent = "";
+          try {
+            const res = await fetch("/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ question }),
+            });
+            const data = await res.json();
+            responseDiv.textContent = data.answer || "Yanıt alınamadı.";
+            responseDiv.style.display = "block";
+          } catch {
+            responseDiv.textContent = "Bir hata oluştu.";
+            responseDiv.style.display = "block";
+          }
+        });
+    </script>
+  </body>
+</html>

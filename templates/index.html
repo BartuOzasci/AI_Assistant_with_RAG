@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bartu'nun Yapay Zeka Avukatı</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%);
+        margin: 0;
+        padding: 0;
+      }
+      .chatbot-container {
+        max-width: 480px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+      @media (min-width: 900px) {
+        .chatbot-container {
+          max-width: 700px;
+        }
+        .chat-window {
+          min-height: 520px;
+          max-height: 800px;
+          font-size: 1.15rem;
+        }
+        .chat-input-area textarea {
+          min-height: 120px;
+          max-height: 320px;
+          font-size: 1.15rem;
+        }
+      }
+      @media (min-width: 1200px) {
+        .chatbot-container {
+          max-width: 1000px;
+        }
+        .chat-window {
+          min-height: 600px;
+          max-height: 900px;
+          font-size: 1.2rem;
+        }
+        .chat-input-area textarea {
+          min-height: 140px;
+          max-height: 400px;
+          font-size: 1.2rem;
+        }
+      }
+      @media (max-width: 600px) {
+        .chatbot-container {
+          max-width: 100vw;
+          border-radius: 0;
+          margin: 0;
+        }
+        .chat-window {
+          min-height: 320px;
+          max-height: 400px;
+          font-size: 1rem;
+        }
+        .chat-input-area textarea {
+          min-height: 80px;
+          max-height: 180px;
+          font-size: 1rem;
+        }
+      }
+      .chatbot-header {
+        display: flex;
+        align-items: center;
+        background: #0078d7;
+        padding: 18px 24px;
+        color: #fff;
+      }
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+        background: #fff;
+        object-fit: cover;
+        border: 2px solid #fff;
+      }
+      .welcome-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+      .chat-window {
+        flex: 1;
+        padding: 24px;
+        background: #f7faff;
+        overflow-y: auto;
+        min-height: 420px;
+        max-height: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .bubble {
+        max-width: 80%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-size: 1rem;
+        line-height: 1.5;
+        word-break: break-word;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
+      }
+      .bubble.user {
+        background: #e3f0ff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+      .bubble.bot {
+        background: #fff;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid #e3e3e3;
+      }
+      .chat-input-area {
+        display: flex;
+        gap: 8px;
+        padding: 16px 24px;
+        background: #f7faff;
+        border-top: 1px solid #e3e3e3;
+        align-items: flex-end;
+      }
+      .chat-input-area textarea {
+        flex: 1;
+        resize: none;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        font-size: 1rem;
+        margin-bottom: 0;
+        min-height: 120px;
+        max-height: 260px;
+      }
+      .pdf-upload-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0 24px 8px 24px;
+        background: #f7faff;
+        gap: 8px;
+      }
+      .pdf-label {
+        background: #0078d7;
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+      .pdf-label:hover {
+        background: #005fa3;
+      }
+      .pdf-name {
+        font-size: 1rem;
+        color: #333;
+        margin-left: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .pdf-remove {
+        color: #d32f2f;
+        font-weight: bold;
+        cursor: pointer;
+        margin-left: 4px;
+        font-size: 1.1em;
+      }
+      .typing-indicator {
+        font-size: 0.95rem;
+        color: #888;
+        background: none;
+        padding: 0 18px;
+        margin-bottom: 8px;
+        align-self: flex-start;
+      }
+      .chatbot-footer {
+        text-align: center;
+        color: #888;
+        font-size: 1rem;
+        margin: 32px 0 12px 0;
+        letter-spacing: 0.2px;
+      }
+      @media (max-width: 600px) {
+        .chatbot-footer {
+          position: fixed;
+          left: 0;
+          bottom: 0;
+          width: 100vw;
+          background: #f7faff;
+          margin: 0;
+          padding: 12px 0 8px 0;
+          z-index: 10;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chatbot-container">
+      <div class="chatbot-header">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+          alt="Avukat Avatarı"
+          class="avatar"
+        />
+        <div class="welcome-text">
+          Bartu'nun Yapay Zeka Avukatına Hoşgeldiniz
+        </div>
+      </div>
+      <div id="chat-window" class="chat-window"></div>
+      <form
+        id="questionForm"
+        enctype="multipart/form-data"
+        class="chat-input-area"
+      >
+        <textarea
+          id="question"
+          name="question"
+          rows="2"
+          placeholder="Sorunuzu yazın..."
+          required
+        ></textarea>
+        <button type="submit">Gönder</button>
+      </form>
+      <div class="pdf-upload-bar">
+        <input
+          type="file"
+          id="pdf"
+          name="pdf"
+          accept="application/pdf"
+          style="display: none"
+        />
+        <label for="pdf" class="pdf-label">PDF Seç</label>
+        <span id="pdf-name" class="pdf-name"></span>
+      </div>
+    </div>
+    <footer class="chatbot-footer">
+      Bartu Özaşçı tarafından oluşturulmuştur
+    </footer>
+    <script>
+      const chatWindow = document.getElementById("chat-window");
+      const form = document.getElementById("questionForm");
+      const textarea = document.getElementById("question");
+      const pdfInput = document.getElementById("pdf");
+      const pdfNameSpan = document.getElementById("pdf-name");
+
+      // Enter ile gönderme
+      textarea.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          form.dispatchEvent(
+            new Event("submit", { cancelable: true, bubbles: true })
+          );
+        }
+      });
+
+      function addBubble(text, sender) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble " + sender;
+        bubble.textContent = text;
+        chatWindow.appendChild(bubble);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+
+      function addTypingIndicator() {
+        const typing = document.createElement("div");
+        typing.className = "typing-indicator";
+        typing.textContent = "Yanıt hazırlanıyor, lütfen bekleyin...";
+        typing.id = "typing-indicator";
+        chatWindow.appendChild(typing);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        const typing = document.getElementById("typing-indicator");
+        if (typing) typing.remove();
+      }
+
+      function typeBotAnswer(answer) {
+        removeTypingIndicator();
+        const bubble = document.createElement("div");
+        bubble.className = "bubble bot";
+        chatWindow.appendChild(bubble);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        let i = 0;
+        function typeChar() {
+          if (i <= answer.length) {
+            bubble.textContent = answer.slice(0, i);
+            i++;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            setTimeout(typeChar, 12);
+          }
+        }
+        typeChar();
+      }
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const question = textarea.value.trim();
+        if (!question) return;
+        addBubble(question, "user");
+        textarea.value = "";
+        addTypingIndicator();
+        const pdfFile = pdfInput.files[0];
+        const formData = new FormData();
+        formData.append("question", question);
+        if (pdfFile) formData.append("pdf", pdfFile);
+        try {
+          const res = await fetch("/ask", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          typeBotAnswer(data.answer || "Yanıt alınamadı.");
+        } catch {
+          removeTypingIndicator();
+          typeBotAnswer("Bir hata oluştu.");
+        }
+      });
+
+      pdfInput.addEventListener("change", function () {
+        if (pdfInput.files.length > 0) {
+          const fileName = pdfInput.files[0].name;
+          pdfNameSpan.innerHTML = `${fileName} <span class='pdf-remove' title='Kaldır'>×</span>`;
+          document.querySelector(".pdf-remove").onclick = function () {
+            pdfInput.value = "";
+            pdfNameSpan.textContent = "";
+          };
+        } else {
+          pdfNameSpan.textContent = "";
+        }
+      });
+
+      // Dosya seçimi ilk sorudan sonra da kalsın
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const question = textarea.value.trim();
+        if (!question) return;
+        addBubble(question, "user");
+        textarea.value = "";
+        addTypingIndicator();
+        const pdfFile = pdfInput.files[0];
+        const formData = new FormData();
+        formData.append("question", question);
+        if (pdfFile) formData.append("pdf", pdfFile);
+        try {
+          const res = await fetch("/ask", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          typeBotAnswer(data.answer || "Yanıt alınamadı.");
+        } catch {
+          removeTypingIndicator();
+          typeBotAnswer("Bir hata oluştu.");
+        }
+        // pdfInput.value ve pdfNameSpan temizlenmiyor, dosya seçili kalıyor
+      });
+    </script>
+  </body>
+</html>
